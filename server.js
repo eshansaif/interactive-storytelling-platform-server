@@ -10,6 +10,7 @@ const serviceAccount = JSON.parse(
   fs.readFileSync(process.env.FIREBASE_ADMIN_SDK_JSON_PATH, "utf8")
 );
 
+const storyRoutes = require("./routes/storyRoutes");
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
@@ -37,6 +38,7 @@ app.get("/test", (req, res) => {
 });
 
 // API Routes
+app.use("/api/stories", storyRoutes);
 app.use("/api/auth", authRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
