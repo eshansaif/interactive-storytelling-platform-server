@@ -1,11 +1,40 @@
 const mongoose = require("mongoose");
 
-const StorySchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  choices: { type: Array, default: [] },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  createdAt: { type: Date, default: Date.now },
+const choiceSchema = new mongoose.Schema({
+  text: String,
+  next: String,
 });
 
-module.exports = mongoose.model("Story", StorySchema);
+const sectionSchema = new mongoose.Schema({
+  text: String,
+  choices: [choiceSchema],
+});
+
+const storySchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    content: {
+      type: Map,
+      of: sectionSchema,
+      required: true,
+    },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    statistics: {
+      type: Map,
+      of: {
+        type: Map,
+        of: Number,
+      },
+    },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model("Story", storySchema);

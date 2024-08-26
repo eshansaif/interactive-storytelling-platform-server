@@ -1,44 +1,22 @@
-require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const PORT = process.env.PORT;
-const firebaseAdmin = require("firebase-admin");
-const fs = require("fs");
-
-const serviceAccount = JSON.parse(
-  fs.readFileSync(process.env.FIREBASE_ADMIN_SDK_JSON_PATH, "utf8")
-);
-
-const storyRoutes = require("./routes/storyRoutes");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const storyRoutes = require("./routes/storyRoutes");
+const cors = require("cors");
+
+dotenv.config();
+connectDB();
 
 const app = express();
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(cors({ origin: ["http://localhost:5173"] }));
 
-// Initialize Firebase Admin SDK
-firebaseAdmin.initializeApp({
-  credential: firebaseAdmin.credential.cert(serviceAccount),
-});
-
-// Connect to MongoDB
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
-
-// server test api
-app.get("/test", (req, res) => {
-  res.send("Server running successfully");
-});
-
-// API Routes
-app.use("/api/stories", storyRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/stories", storyRoutes);
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
